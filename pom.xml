@@ -4,9 +4,37 @@
 	<modelVersion>4.0.0</modelVersion>
 
   <groupId>cd.connect.servlet</groupId>
-	<artifactId>connect-servlet-spring-jersey</artifactId>
+	<artifactId>servlet-spring-jersey</artifactId>
 	<version>1.1-SNAPSHOT</version>
-	<name>connect-servlet-spring-jersey</name>
+	<name>servlet-spring-jersey</name>
+
+	<description>
+		servlet-spring-jersey - spring/jersey support. requires spring-web's RequestContextFilter.
+	</description>
+
+	<url>https://clearpointnz.github.io/connect/</url>
+	<developers>
+		<developer>
+			<email>richard@bluetrainsoftware.com</email>
+			<id>rvowles</id>
+			<name>Richard Vowles</name>
+			<organization>on behalf of ClearPoint NZ Ltd</organization>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>https://opensource.org/licenses/Apache-2.0</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:clearpointnz/connect-java-servlet-spring-jersey.git</connection>
+		<developerConnection>scm:git:git@github.com:clearpointnz/connect-java-servlet-spring-jersey.git</developerConnection>
+		<url>git@github.com:clearpointnz/connect-java-servlet-spring-jersey.git</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<dependencies>
 		<dependency>
@@ -57,7 +85,7 @@
 				<configuration>
 					<filtering>false</filtering>
 					<tiles>
-						<tile>cd.connect.tiles:tile-java:[1.1, 2)</tile>
+						<tile>cd.connect.tiles:tile-java:[1.2, 2)</tile>
 					</tiles>
 				</configuration>
 			</plugin>
