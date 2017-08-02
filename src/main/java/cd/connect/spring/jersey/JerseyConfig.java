@@ -1,7 +1,7 @@
 package cd.connect.spring.jersey;
 
+import cd.connect.spring.Module;
 import cd.connect.spring.jersey.log.JerseyFilteringConfiguration;
-import nz.connect.spring.Module;
 
 import java.util.stream.Stream;
 
