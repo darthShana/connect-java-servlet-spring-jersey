@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import javax.ws.rs.core.Configurable;
 import java.util.stream.Stream;
 
 import static org.glassfish.jersey.servlet.ServletProperties.PROVIDER_WEB_APP;
@@ -60,7 +61,7 @@ public class JerseyApplicationBase extends ResourceConfig implements JerseyAppli
 
 	private void registerLogging(ApplicationContext context) {
 		try {
-			context.getBean(JerseyFiltering.class).registerFilters(this);
+			context.getBean(JerseyFiltering.class).registerFilters(Configurable.class.cast(this));
 		} catch (Exception ex) {
 			logger.warn("Unable register logging or path exclusion - perhaps you didn't include `{}` class?", JerseyConfig.class.getName());
 		}

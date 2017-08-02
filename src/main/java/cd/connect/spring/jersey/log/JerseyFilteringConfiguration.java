@@ -10,6 +10,7 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletProperties;
 
+import javax.ws.rs.core.Configurable;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
@@ -35,28 +36,29 @@ public class JerseyFilteringConfiguration implements JerseyFiltering {
 	private Set<String> excludeUri;
 	private Set<String> excludeEntirelyUri;
 
-	@ConfigKey("jersey.logging.exclude-body-uris")
-	protected String excludeBodyUris = "";
-
-	@ConfigKey("jersey.logging.exclude-entirely-uris")
-	protected String excludeEntirelyUris = "";
-
-	@ConfigKey("jersey.exclude")
 	protected String exclude = ""; // e.g. /(apibrowser|metrics|service|status).*
-
-	@ConfigKey("jersey.tracing")
 	protected String tracing = ""; // e.g. ON_DEMAND
+	protected Integer bufferSize;
 
-	@ConfigKey("jersey.bufferSize")
-	protected Integer bufferSize = 8192;
+	public JerseyFilteringConfiguration() {
+		// we need these values on startup as we need this bean to be up and valid when the
+		// wiring is being done.
+		init();
+	}
 
 	@PostConfigured
 	public void init() {
+
+		exclude = System.getProperty("jersey.exclude", "");
+		tracing = System.getProperty("jersey.tracing", "");
+
+		bufferSize = Integer.parseInt(System.getProperty("jersey.bufferSize", "8192"));
+
 		/*
 		* we are default using Kubernetes and Prometheus, so we should ignore at least these by default.
 		 */
-		excludeUri = deconstructConfiguration(excludeBodyUris);
-		excludeEntirelyUri = deconstructConfiguration(excludeEntirelyUris);
+		excludeUri = deconstructConfiguration(System.getProperty("jersey.logging.exclude-body-uris", ""));
+		excludeEntirelyUri = deconstructConfiguration(System.getProperty("jersey.logging.exclude-entirely-uris", ""));
 	}
 
 	private Set<String> deconstructConfiguration(String toSplit)  {
@@ -91,7 +93,7 @@ public class JerseyFilteringConfiguration implements JerseyFiltering {
 	}
 
 	@Override
-	public void registerFilters(ResourceConfig resourceConfig) {
+	public void registerFilters(Configurable<?> resourceConfig) {
 		if (exclude.length() > 0) {
 			resourceConfig.property(ServletProperties.FILTER_STATIC_CONTENT_REGEX, exclude);
 		}
