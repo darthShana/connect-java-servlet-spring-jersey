@@ -2,14 +2,14 @@ package cd.connect.spring.jersey.log;
 
 import cd.connect.context.ConnectContext;
 import cd.connect.spring.jersey.JerseyLoggerPoint;
-import com.bluetrainsoftware.common.config.ConfigKey;
 import net.stickycode.stereotype.configured.PostConfigured;
 import org.glassfish.jersey.logging.Constants;
+import org.glassfish.jersey.logging.FilteringClientLoggingFilter;
 import org.glassfish.jersey.logging.FilteringServerLoggingFilter;
 import org.glassfish.jersey.logging.LoggingFeature;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletProperties;
 
+import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configurable;
 import java.util.Objects;
 import java.util.Set;
@@ -102,15 +102,28 @@ public class JerseyFilteringConfiguration implements JerseyFiltering {
 			resourceConfig.property("jersey.config.server.tracing.type", tracing);
 		}
 
-		// determine if we need to log any of the Jersey stuff. See the TracingJerseyLogger for details.
-		if (JerseyLoggerPoint.logger.isTraceEnabled()) {
-			resourceConfig.register(newLogger(this, LoggingFeature.Verbosity.PAYLOAD_ANY));
-		} else if (JerseyLoggerPoint.logger.isDebugEnabled()) {
-			resourceConfig.register(newLogger(this, LoggingFeature.Verbosity.HEADERS_ONLY));
+		if (resourceConfig.getConfiguration().getRuntimeType() == RuntimeType.CLIENT) {
+			// determine if we need to log any of the Jersey stuff. See the TracingJerseyLogger for details.
+			if (JerseyLoggerPoint.logger.isTraceEnabled()) {
+				resourceConfig.register(newClientLogger(this, LoggingFeature.Verbosity.PAYLOAD_ANY));
+			} else if (JerseyLoggerPoint.logger.isDebugEnabled()) {
+				resourceConfig.register(newClientLogger(this, LoggingFeature.Verbosity.HEADERS_ONLY));
+			}
+		} else {
+			// determine if we need to log any of the Jersey stuff. See the TracingJerseyLogger for details.
+			if (JerseyLoggerPoint.logger.isTraceEnabled()) {
+				resourceConfig.register(newServerLogger(this, LoggingFeature.Verbosity.PAYLOAD_ANY));
+			} else if (JerseyLoggerPoint.logger.isDebugEnabled()) {
+				resourceConfig.register(newServerLogger(this, LoggingFeature.Verbosity.HEADERS_ONLY));
+			}
 		}
 	}
 
-	private FilteringServerLoggingFilter newLogger(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity) {
+	private FilteringServerLoggingFilter newServerLogger(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity) {
 		return new FilteringServerLoggingFilter(jerseyFiltering, JerseyLoggerPoint.julLogger, Level.ALL, verbosity, bufferSize);
+	}
+
+	private FilteringClientLoggingFilter newClientLogger(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity) {
+		return new FilteringClientLoggingFilter(jerseyFiltering, JerseyLoggerPoint.julLogger, Level.ALL, verbosity, bufferSize);
 	}
 }
