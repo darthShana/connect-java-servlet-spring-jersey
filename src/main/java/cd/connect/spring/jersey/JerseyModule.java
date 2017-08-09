@@ -41,7 +41,7 @@ abstract public class JerseyModule extends ServletModule {
 		ResourceConfig base = ResourceConfig.class.cast(jerseyResourceConfig);
 
 		servlet(new ServletContainer(base), s ->
-			s.priority(100).name(this.getClass().getName() + "-servlet")
+			s.priority(100).name(this.getClass().getSimpleName() + "_servlet")
 				.url(getUrlServletPrefix())
 				.param(ServletProperties.FILTER_CONTEXT_PATH, getUrlServletPrefix()));
 	}
