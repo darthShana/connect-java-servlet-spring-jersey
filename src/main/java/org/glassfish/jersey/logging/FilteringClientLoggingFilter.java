@@ -15,8 +15,6 @@ import javax.ws.rs.container.PreMatching;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Note Jersey's ClientLoggingFilter is final so this is effectively the replacement for that.
@@ -30,13 +28,13 @@ import java.util.logging.Logger;
 @SuppressWarnings("ClassWithMultipleLoggers")
 public class FilteringClientLoggingFilter extends BaseFilteringLogger implements ClientRequestFilter, ClientResponseFilter {
 
-	public FilteringClientLoggingFilter(JerseyFiltering jerseyFiltering, Logger logger, Level level, LoggingFeature.Verbosity verbosity, int maxEntitySize) {
-		super(jerseyFiltering, logger, level, verbosity, maxEntitySize);
+	public FilteringClientLoggingFilter(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity, int maxEntitySize) {
+		super(jerseyFiltering,verbosity, maxEntitySize);
 	}
 
 	@Override
 	public void filter(final ClientRequestContext context) throws IOException {
-		if (!logger.isLoggable(level)) {
+		if (!logger.isTraceEnabled()) {
 			return;
 		}
 		long id = _id.incrementAndGet();
@@ -64,8 +62,7 @@ public class FilteringClientLoggingFilter extends BaseFilteringLogger implements
 
 	@Override
 	public void filter(final ClientRequestContext requestContext, final ClientResponseContext responseContext) throws IOException {
-
-		if (!logger.isLoggable(level)) {
+		if (!logger.isTraceEnabled()) {
 			return;
 		}
 		Object requestId = requestContext.getProperty(LOGGING_ID_PROPERTY);

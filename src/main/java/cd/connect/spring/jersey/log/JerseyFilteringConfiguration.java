@@ -13,8 +13,6 @@ import javax.ws.rs.RuntimeType;
 import javax.ws.rs.core.Configurable;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,8 +29,6 @@ import java.util.stream.Stream;
  */
 
 public class JerseyFilteringConfiguration implements JerseyFiltering {
-	private static final Logger logRef = JerseyLoggerPoint.julLogger;
-
 	private Set<String> excludeUri;
 	private Set<String> excludeEntirelyUri;
 
@@ -74,10 +70,10 @@ public class JerseyFilteringConfiguration implements JerseyFiltering {
 	 */
 	public boolean excludePayloadForUri(String uriPath) {
 		if (excludeUri.contains(uriPath)) {
-			if (logRef.isLoggable(Level.FINE)) {
+			if (JerseyLoggerPoint.logger.isTraceEnabled()) {
 				// mention we are excluding payload logging
 				ConnectContext.set(Constants.REST_CONTEXT, "exclude payload logging for uriPath:" + uriPath);
-				logRef.fine("no payload");
+				JerseyLoggerPoint.logger.trace("no payload");
 				ConnectContext.remove(Constants.REST_CONTEXT);
 			}
 			return true;
@@ -120,10 +116,10 @@ public class JerseyFilteringConfiguration implements JerseyFiltering {
 	}
 
 	private FilteringServerLoggingFilter newServerLogger(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity) {
-		return new FilteringServerLoggingFilter(jerseyFiltering, JerseyLoggerPoint.julLogger, Level.ALL, verbosity, bufferSize);
+		return new FilteringServerLoggingFilter(jerseyFiltering,  verbosity, bufferSize);
 	}
 
 	private FilteringClientLoggingFilter newClientLogger(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity) {
-		return new FilteringClientLoggingFilter(jerseyFiltering, JerseyLoggerPoint.julLogger, Level.ALL, verbosity, bufferSize);
+		return new FilteringClientLoggingFilter(jerseyFiltering, verbosity, bufferSize);
 	}
 }

@@ -32,8 +32,8 @@ public class FilteringServerLoggingFilter extends BaseFilteringLogger implements
 	 * Create a logging filter with custom logger and custom settings of entity
 	 * logging.
 	 */
-	public FilteringServerLoggingFilter(JerseyFiltering jerseyFiltering, Logger logger, Level level, LoggingFeature.Verbosity verbosity, int maxEntitySize) {
-		super(jerseyFiltering, logger, level, verbosity, maxEntitySize);
+	public FilteringServerLoggingFilter(JerseyFiltering jerseyFiltering, LoggingFeature.Verbosity verbosity, int maxEntitySize) {
+		super(jerseyFiltering, verbosity, maxEntitySize);
 	}
 
 
@@ -83,7 +83,7 @@ public class FilteringServerLoggingFilter extends BaseFilteringLogger implements
 		printPrefixedHeaders(b, id, RESPONSE_PREFIX, responseContext.getStringHeaders());
 
 		if (responseContext.hasEntity() && printEntity(verbosity, responseContext.getMediaType())) {
-			OutputStream stream = new LoggingInterceptor.LoggingStream(b, responseContext.getEntityStream());
+			OutputStream stream = new BaseFilteringLogger.LoggingStream(b, responseContext.getEntityStream());
 			responseContext.setEntityStream(stream);
 			requestContext.setProperty(ENTITY_LOGGER_PROPERTY, stream);
 			// not calling log(b) here - it will be called by the interceptor
