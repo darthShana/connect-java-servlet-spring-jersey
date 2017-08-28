@@ -34,7 +34,8 @@ public class FilteringClientLoggingFilter extends BaseFilteringLogger implements
 
 	@Override
 	public void filter(final ClientRequestContext context) throws IOException {
-		if (!logger.isTraceEnabled()) {
+		String uriPath = context.getUri().getPath();
+		if (!logger.isTraceEnabled() || jerseyFiltering.excludeForUri(uriPath)) {
 			return;
 		}
 		long id = _id.incrementAndGet();
@@ -48,7 +49,6 @@ public class FilteringClientLoggingFilter extends BaseFilteringLogger implements
 		printRequestLine(b, "Sending client request", id, context.getMethod(), uri);
 		printPrefixedHeaders(b, id, REQUEST_PREFIX, context.getStringHeaders());
 
-		String uriPath = context.getUri().getPath();
 
 		if (context.hasEntity() && printEntity(verbosity, context.getMediaType()) && !jerseyFiltering.excludePayloadForUri(uriPath)) {
 			OutputStream stream = new LoggingStream(b, context.getEntityStream());
@@ -62,7 +62,8 @@ public class FilteringClientLoggingFilter extends BaseFilteringLogger implements
 
 	@Override
 	public void filter(final ClientRequestContext requestContext, final ClientResponseContext responseContext) throws IOException {
-		if (!logger.isTraceEnabled()) {
+		String uriPath = requestContext.getUri().getPath();
+		if (!logger.isTraceEnabled() || jerseyFiltering.excludeForUri(uriPath)) {
 			return;
 		}
 		Object requestId = requestContext.getProperty(LOGGING_ID_PROPERTY);
@@ -73,8 +74,7 @@ public class FilteringClientLoggingFilter extends BaseFilteringLogger implements
 		printPrefixedHeaders(b, id, RESPONSE_PREFIX, responseContext.getHeaders());
 
 		if (responseContext.hasEntity() && printEntity(verbosity, responseContext.getMediaType())) {
-			responseContext.setEntityStream(logInboundEntity(b, responseContext.getEntityStream(),
-					MessageUtils.getCharset(responseContext.getMediaType())));
+			responseContext.setEntityStream(logInboundEntity(b, responseContext.getEntityStream(), MessageUtils.getCharset(responseContext.getMediaType())));
 		}
 
 		log(b);
